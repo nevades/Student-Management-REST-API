@@ -39,14 +39,30 @@ const addStudent = (req, res) => {
 const removeStudent = (req, res) => {
   const id = parseInt(req.params.id);
 
-  pool.query(queries.checkStudentExists, [id], (error, results) => {
+  pool.query(queries.getStudentById, [id], (error, results) => {
     if (results.rows.length) {
       pool.query(queries.delStudent, [id], (error, results) => {
         if (error) throw error;
         res.status(201).send("Student Deleted Sucessfully");
       });
     } else {
-      res.send("Student with specific ID dosen't exist");
+      res.send(`Student with ID : ${id} dosen't exist`);
+    }
+  });
+};
+
+const updateStudent = (req, res) => {
+  const id = parseInt(req.params.id);
+  const { name } = req.body;
+
+  pool.query(queries.getStudentById, [id], (error, results) => {
+    if (results.rows.length) {
+      pool.query(queries.updateStudentName, [name, id], (error, results) => {
+        if (error) throw error;
+        res.status(201).send("Student Updated Sucessfully");
+      });
+    } else {
+      res.send(`Student with ID : ${id} dosen't exist`);
     }
   });
 };
@@ -56,4 +72,5 @@ module.exports = {
   getStudentById,
   addStudent,
   removeStudent,
+  updateStudent,
 };
